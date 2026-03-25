@@ -25,6 +25,20 @@ class View(object):
             ft.Row(spacing=30, controls=[self.__theme_switch, self.__title, ],
                    alignment=ft.MainAxisAlignment.START)
         )
+        self._lingua = ft.Dropdown(width=200, options=[ft.dropdown.Option("italian"),ft.dropdown.Option("english"),ft.dropdown.Option("spanish")], on_change= lambda e: self.__controller.printaLingua(self._lingua.value, e))
+        self._tipo = ft.Dropdown(width=200, options=[ft.dropdown.Option("Default"), ft.dropdown.Option("Lineare"),
+                                                       ft.dropdown.Option("Dicotomica")],  on_change= lambda e: self.__controller.printaModalita(self._tipo.value, e))
+        self._inserisci = ft.TextField(label="Inserisci Parola da Correggere")
+        self._correzione = ft.ElevatedButton(text="Starta", on_click = lambda e: self.__controller.handleSentence(self._inserisci.value, e))
+        self._comunicazioni = ft.ListView(expand=True)
+        row1 = ft.Row(controls=[self._lingua])
+        row2 = ft.Row(controls=[self._tipo,self._inserisci, self._correzione])
+        row3 = ft.Row(controls=[self._comunicazioni])
+        self.page.add(row1,row2,row3)
+
+
+
+
 
         # Add your stuff here
 
