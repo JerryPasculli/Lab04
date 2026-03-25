@@ -7,56 +7,59 @@ class SpellChecker:
     def __init__(self, view):
         self._multiDic = md.MultiDictionary()
         self._view = view
+        self._flagLingua = False
+        self._flagModalita = False
+        self._lingua = None
+        self._modalita = None
 
     def handleSentence(self, txtIn, e):
-        if self._flagLingua == False or self._flagModalita==False:
-            self._view._comunicazioni.controls.append(ft.Text("Non hai completato i campi precedenti"))
+        if self._flagLingua == False or self._flagModalita==False or txtIn == "":
+            self._view._comunicazioni.controls.append(ft.Text("Non hai completato tutti i campi", color="red"))
             self._view.update()
-            exit()
         txtIn = replaceChars(txtIn.lower())
 
         words = txtIn.split()
         paroleErrate = " - "
+        if txtIn !="":
+            match self._modalita:
+                case "Default":
+                    t1 = time.time()
+                    parole = self._multiDic.searchWord(words, self._lingua)
+                    for parola in parole:
+                        if not parola.corretta:
+                            paroleErrate = paroleErrate + str(parola) + " - "
+                    t2 = time.time()
+                    self._view._comunicazioni.controls.append(ft.Text(f"Frase inserita: {txtIn}"))
+                    self._view._comunicazioni.controls.append(ft.Text(f"Parole errate: {paroleErrate}"))
+                    self._view._comunicazioni.controls.append(ft.Text(f"Ci hai impiegato: {t2-t1} secondi"))
+                    self._view.update()
 
-        match self._modalita:
-            case "Default":
-                t1 = time.time()
-                parole = self._multiDic.searchWord(words, self._lingua)
-                for parola in parole:
-                    if not parola.corretta:
-                        paroleErrate = paroleErrate + str(parola) + " - "
-                t2 = time.time()
-                self._view._comunicazioni.controls.append(ft.Text(f"Frase inserita: {txtIn}"))
-                self._view._comunicazioni.controls.append(ft.Text(f"Parole errate: {paroleErrate}"))
-                self._view._comunicazioni.controls.append(ft.Text(f"Ci hai impiegato: {t2-t1} secondi"))
-                self._view.update()
+                case "Lineare":
+                    t1 = time.time()
+                    parole = self._multiDic.searchWordLinear(words, self._lingua)
+                    for parola in parole:
+                        if not parola.corretta:
+                            paroleErrate = paroleErrate + str(parola) + " "
+                    t2 = time.time()
+                    self._view._comunicazioni.controls.append(ft.Text(f"Frase inserita: {txtIn}"))
+                    self._view._comunicazioni.controls.append(ft.Text(f"Parole errate: {paroleErrate}"))
+                    self._view._comunicazioni.controls.append(ft.Text(f"Ci hai impiegato: {t2 - t1} secondi"))
+                    self._view.update()
 
-            case "Lineare":
-                t1 = time.time()
-                parole = self._multiDic.searchWordLinear(words, self._lingua)
-                for parola in parole:
-                    if not parola.corretta:
-                        paroleErrate = paroleErrate + str(parola) + " "
-                t2 = time.time()
-                self._view._comunicazioni.controls.append(ft.Text(f"Frase inserita: {txtIn}"))
-                self._view._comunicazioni.controls.append(ft.Text(f"Parole errate: {paroleErrate}"))
-                self._view._comunicazioni.controls.append(ft.Text(f"Ci hai impiegato: {t2 - t1} secondi"))
-                self._view.update()
-
-            case "Dicotomica":
-                t1 = time.time()
-                parole = self._multiDic.searchWordDichotomic(words, self._lingua)
-                for parola in parole:
-                    if not parola.corretta:
-                        paroleErrate = paroleErrate + str(parola) + " - "
-                t2 = time.time()
-                self._view._comunicazioni.controls.append(ft.Text(f"Frase inserita: {txtIn}"))
-                self._view._comunicazioni.controls.append(ft.Text(f"Parole errate: {paroleErrate}"))
-                self._view._comunicazioni.controls.append(ft.Text(f"Ci hai impiegato: {t2 - t1} secondi"))
-                self._view.update()
-            case _:
-                return None
-        self.pulisci()
+                case "Dicotomica":
+                    t1 = time.time()
+                    parole = self._multiDic.searchWordDichotomic(words, self._lingua)
+                    for parola in parole:
+                        if not parola.corretta:
+                            paroleErrate = paroleErrate + str(parola) + " - "
+                    t2 = time.time()
+                    self._view._comunicazioni.controls.append(ft.Text(f"Frase inserita: {txtIn}"))
+                    self._view._comunicazioni.controls.append(ft.Text(f"Parole errate: {paroleErrate}"))
+                    self._view._comunicazioni.controls.append(ft.Text(f"Ci hai impiegato: {t2 - t1} secondi"))
+                    self._view.update()
+                case _:
+                    return None
+            self.pulisci()
 
     def printaLingua(self, x, e):
         self._flagLingua = False
